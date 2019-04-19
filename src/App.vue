@@ -71,7 +71,7 @@ export default {
   },
   data () {
     return {
-      country: 'CA',
+      phoneCountry: 'CA',
       phoneNumber: '+15062345678',
       phoneNumberDetails: null,
       error: null
@@ -84,10 +84,10 @@ export default {
   },
   methods: {
     onSubmit () {
-      alert(`${this.phoneNumber.country} — ${this.phoneNumber.number}`)
+      alert(`${this.phoneCountry} — ${this.phoneNumber}`)
     },
     onCountry (country) {
-      this.country = country
+      this.phoneCountry = country
     },
     onUpdate (data) {
       this.phoneNumberDetails = data
