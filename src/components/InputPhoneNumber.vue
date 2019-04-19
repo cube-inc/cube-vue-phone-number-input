@@ -1,10 +1,9 @@
 <template>
-  <div class="cube-phone-number-input" @click="focus">
+  <div class="cube-phone-number-input">
     <select
       class="country-code-selector"
       :class="countryCodeClass"
       v-model="selectedCountry"
-      @click.stop
       @change="onCountry"
       required
     >
@@ -30,7 +29,7 @@
 </template>
 
 <script>
-import { parsePhoneNumber, AsYouType } from 'libphonenumber-js/max'
+import { parsePhoneNumber, AsYouType, ParseError } from 'libphonenumber-js/max'
 import countries from '../assets/countries.json'
 
 export default {
@@ -66,14 +65,9 @@ export default {
         const phoneNumber = this.parsePhoneNumber(this.phoneNumberInput, this.selectedCountry)
         this.updateModel(phoneNumber)
         this.checkValidity(phoneNumber)
-        this.$emit('update', phoneNumber)
-        this.$emit('country', phoneNumber.country)
-        this.$emit('input', phoneNumber.number)
       } catch (error) {
-        this.setValidityErrorMessage(error)
-        this.$emit('error', error)
+        this.ParseError(error)
       }
-      this.$nextTick(this.focus)
     },
     onInput (event) {
       try {
@@ -82,12 +76,8 @@ export default {
           this.updateModel(phoneNumber)
         }
         this.checkValidity(phoneNumber)
-        this.$emit('update', phoneNumber)
-        this.$emit('country', phoneNumber.country)
-        this.$emit('input', phoneNumber.number)
       } catch (error) {
-        this.setValidityErrorMessage(error)
-        this.$emit('error', error)
+        this.ParseError(error)
       }
     },
     formatNational (input, country = null) {
@@ -102,7 +92,7 @@ export default {
       const numberFormatted = phoneNumber.formatInternational()
       const nationalNumberFormatted = valid ? phoneNumber.formatNational() : this.formatNational(input, selectedCountry)
       const uri = phoneNumber.getURI()
-      return {
+      const phoneNumberDetails = {
         country,
         countryCallingCode,
         number,
@@ -114,6 +104,18 @@ export default {
         valid,
         type
       }
+      this.$emit('country', country)
+      this.$emit('update', phoneNumberDetails)
+      this.$emit('input', number)
+      return phoneNumberDetails
+    },
+    ParseError (error) {
+      const message = error instanceof ParseError
+        ? this.validityErrorMessage
+        : error
+      this.setValidityErrorMessage(message)
+      this.$emit('error', error)
+      return message
     },
     updateModel (phoneNumber) {
       if (phoneNumber.country) {
@@ -125,25 +127,21 @@ export default {
       this.$refs.input.setCustomValidity(message)
     },
     checkValidity (phoneNumber) {
-      if (phoneNumber.valid) {
-        this.setValidityErrorMessage('')
-      } else {
-        this.setValidityErrorMessage(this.validityErrorMessage)
-      }
+      const valid = phoneNumber.valid
+      const validityMessage = valid ? '' : this.validityErrorMessage
+      this.setValidityErrorMessage(validityMessage)
+      this.$emit('valid', valid)
+      return valid
     }
   },
-  created () {
+  mounted () {
     if (this.value) {
       try {
         const phoneNumber = this.parsePhoneNumber(this.value, this.country)
         this.updateModel(phoneNumber)
         this.checkValidity(phoneNumber)
-        this.$emit('update', phoneNumber)
-        this.$emit('country', phoneNumber.country)
-        this.$emit('input', phoneNumber.number)
       } catch (error) {
-        this.setValidityErrorMessage(error)
-        this.$emit('error', error)
+        this.ParseError(error)
       }
     }
   }
