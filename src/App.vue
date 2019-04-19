@@ -1,22 +1,19 @@
 <template>
   <div id="app">
-    <h1>
-      Demo
-      <small>cube-vue-phone-number-input</small>
-    </h1>
+    <h1>cube-vue-phone-number-input</h1>
     <section>
-      <h2>Inline demo</h2>
+      <h2>Basics</h2>
       <form @submit.prevent="onSubmit">
         <fieldset class="form-group">
           <label for="phoneNumber" class="form-label">Phone number</label>
           <InputPhoneNumber
             id="phoneNumber"
-            class="form-control inline"
             required
             :country="country"
             v-model="phoneNumber"
             @country="onCountry"
             @update="onUpdate"
+            @valid="onValid"
             @error="onError"
           />
         </fieldset>
@@ -33,6 +30,10 @@
           <pre class="scroll">{{ phoneNumberDetails }}</pre>
         </fieldset>
         <fieldset class="form-group">
+          <legend>@valid</legend>
+          <pre class="scroll">{{ valid }}</pre>
+        </fieldset>
+        <fieldset class="form-group">
           <legend>@error</legend>
           <pre class="scroll">{{ error }}</pre>
         </fieldset>
@@ -44,6 +45,12 @@
           </div>
         </fieldset>
       </form>
+    </section>
+    <section>
+      <h2>Inline theme</h2>
+      <fieldset class="form-group">
+        <InputPhoneNumber class="cube-phone-number-input-inline"/>
+      </fieldset>
     </section>
     <section>
       <h2>Individual input and select classes</h2>
@@ -86,16 +93,19 @@ export default {
       this.phoneNumberDetails = data
       this.error = null
     },
+    onValid (validity) {
+      this.valid = validity
+    },
     onError (error) {
-      this.phoneNumber = null
       this.error = error
+      this.phoneNumberDetails = null
     }
   }
 }
 </script>
 
 <style lang="scss">
-@import './scss/index.scss';
+@import "./scss/cube-phone-number-input-inline.scss";
 
 body {
   margin: 0;
@@ -161,7 +171,7 @@ pre {
   background-color: white;
   transition: all 250ms;
   &:focus:not(:disabled):not(:not(select):read-only) {
-    box-shadow: 0px 3px 6px -2px rgba(black, .2);
+    box-shadow: 0px 3px 6px -2px rgba(black, 0.2);
   }
   &:invalid:not(:placeholder-shown):not(select) {
     border-color: red;
@@ -177,7 +187,8 @@ select.form-control {
   background-repeat: no-repeat;
   background-size: 1.3em;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="grey" viewBox="0 0 512 512"><path d="M256 294.1L383 167c9.4-9.4 24.6-9.4 33.9 0s9.3 24.6 0 34L273 345c-9.1 9.1-23.7 9.3-33.1.7L95 201.1c-4.7-4.7-7-10.9-7-17s2.3-12.3 7-17c9.4-9.4 24.6-9.4 33.9 0l127.1 127z"/></svg>');
-  &:invalid { // Simulate placeholder
+  &:invalid {
+    // Simulate placeholder
     color: #999999;
   }
 }
@@ -192,7 +203,7 @@ select.form-control {
   text-transform: uppercase;
   text-decoration: none;
   font-family: inherit;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
   line-height: 1;
   padding: 0.5em 1em;
@@ -218,12 +229,6 @@ select.form-control {
   }
   > .button + .button {
     margin-left: 8px;
-  }
-}
-.cube-phone-number-input.inline {
-  .country-code-selector {
-    border-right: 1px solid #cccccc;
-    padding-right: 1em;
   }
 }
 </style>
