@@ -11,6 +11,10 @@ A super simple phone number input component for Vue built on top of the [libphon
 - Built on top of the [libphonenumber-js](https://github.com/catamphetamine/libphonenumber-js) library
 - Comes with SCSS themes
 
+## Demo
+
+Let's play with the [demo](https://cube-vue-phone-number-input.netlify.com).
+
 ## Install
 
 ```sh
