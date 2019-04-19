@@ -2,6 +2,7 @@
   <div class="cube-phone-number-input" @click="focus">
     <select
       class="country-code-selector"
+      :class="countryCodeClass"
       v-model="selectedCountry"
       @click.stop
       @change="onCountry"
@@ -19,6 +20,7 @@
       ref="input"
       type="tel"
       class="phone-number-input"
+      :class="inputClass"
       :placeholder="placeholder"
       v-bind="$attrs"
       v-model="phoneNumberInput"
@@ -38,7 +40,10 @@ export default {
     country: { type: String, default: null },
     countries: { type: Array, default: () => countries },
     countryCodePlaceholder: { type: String, default: 'Country' },
-    placeholder: { type: String, default: 'Phone number' }
+    countryCodeClass: { type: [String, Array, Object], default: null },
+    inputClass: { type: [String, Array, Object], default: null },
+    placeholder: { type: String, default: 'Phone number' },
+    validityErrorMessage: { type: String, default: 'Invalid phone number' }
   },
   data () {
     return {
@@ -60,10 +65,12 @@ export default {
       try {
         const phoneNumber = this.parsePhoneNumber(this.phoneNumberInput, this.selectedCountry)
         this.updateModel(phoneNumber)
+        this.checkValidity(phoneNumber)
         this.$emit('update', phoneNumber)
         this.$emit('country', phoneNumber.country)
         this.$emit('input', phoneNumber.number)
       } catch (error) {
+        this.setValidityErrorMessage(error)
         this.$emit('error', error)
       }
       this.$nextTick(this.focus)
@@ -74,10 +81,12 @@ export default {
         if (event.inputType === 'insertText') {
           this.updateModel(phoneNumber)
         }
+        this.checkValidity(phoneNumber)
         this.$emit('update', phoneNumber)
         this.$emit('country', phoneNumber.country)
         this.$emit('input', phoneNumber.number)
       } catch (error) {
+        this.setValidityErrorMessage(error)
         this.$emit('error', error)
       }
     },
@@ -111,6 +120,16 @@ export default {
         this.selectedCountry = phoneNumber.country
       }
       this.phoneNumberInput = phoneNumber.nationalNumberFormatted
+    },
+    setValidityErrorMessage (message) {
+      this.$refs.input.setCustomValidity(message)
+    },
+    checkValidity (phoneNumber) {
+      if (phoneNumber.valid) {
+        this.setValidityErrorMessage('')
+      } else {
+        this.setValidityErrorMessage(this.validityErrorMessage)
+      }
     }
   },
   created () {
@@ -118,10 +137,12 @@ export default {
       try {
         const phoneNumber = this.parsePhoneNumber(this.value, this.country)
         this.updateModel(phoneNumber)
+        this.checkValidity(phoneNumber)
         this.$emit('update', phoneNumber)
         this.$emit('country', phoneNumber.country)
         this.$emit('input', phoneNumber.number)
       } catch (error) {
+        this.setValidityErrorMessage(error)
         this.$emit('error', error)
       }
     }
