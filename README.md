@@ -72,7 +72,7 @@ export default {
 
 | Name    | Description |
 | ---     | ---         |
-| input   | Sent on `PhoneNumber` update with the `PhoneNumber.number` value. |
+| input   | Sent on `PhoneNumber` update with the `PhoneNumber.number` (international format) value. |
 | update  | Sent on `PhoneNumber` update. |
 | country | Sent on `PhoneNumber.country` update based on the user input. |
 | valid   | Sent on `PhoneNumber` validity change. |
