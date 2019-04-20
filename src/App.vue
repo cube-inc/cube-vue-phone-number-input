@@ -9,7 +9,7 @@
           <InputPhoneNumber
             id="phoneNumber"
             required
-            :country="country"
+            :country="phoneCountry"
             v-model="phoneNumber"
             @country="onCountry"
             @update="onUpdate"
@@ -23,7 +23,7 @@
         </fieldset>
         <fieldset class="form-group">
           <legend>@country</legend>
-          <pre class="scroll">{{ country }}</pre>
+          <pre class="scroll">{{ phoneCountry }}</pre>
         </fieldset>
         <fieldset class="form-group">
           <legend>@update</legend>
@@ -74,12 +74,8 @@ export default {
       phoneCountry: 'CA',
       phoneNumber: '+15062345678',
       phoneNumberDetails: null,
+      valid: null,
       error: null
-    }
-  },
-  computed: {
-    valid () {
-      return this.phoneNumberDetails ? this.phoneNumberDetails.valid : false
     }
   },
   methods: {
