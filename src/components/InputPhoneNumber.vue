@@ -3,8 +3,8 @@
     <select
       class="country-code-selector"
       :class="countryCodeClass"
-      v-model="selectedCountry"
-      @change="onCountry"
+      :value="selectedCountry"
+      @input="onCountry"
       required
     >
       <option class="placeholder" :value="null">{{ countryCodePlaceholder }}</option>
@@ -22,14 +22,14 @@
       :class="inputClass"
       :placeholder="placeholder"
       v-bind="$attrs"
-      v-model="phoneNumberInput"
+      :value="phoneNumberFormatted"
       @input="onInput"
     >
   </div>
 </template>
 
 <script>
-import { parsePhoneNumber, AsYouType, ParseError } from 'libphonenumber-js/max'
+import { parsePhoneNumber, parseIncompletePhoneNumber, formatIncompletePhoneNumber, ParseError } from 'libphonenumber-js/max'
 import countries from '../assets/countries.json'
 
 export default {
@@ -47,13 +47,16 @@ export default {
   data () {
     return {
       selectedCountry: this.country,
-      phoneNumberInput: this.value
+      phoneNumber: this.value
     }
   },
   computed: {
     countriesSorted () {
       return Array.from(this.countries)
         .sort((a, b) => a.name.localeCompare(b.name))
+    },
+    phoneNumberFormatted () {
+      return formatIncompletePhoneNumber(this.phoneNumber, this.selectedCountry)
     }
   },
   methods: {
@@ -61,88 +64,69 @@ export default {
       this.$refs.input.focus()
     },
     onCountry (event) {
-      try {
-        const phoneNumber = this.parsePhoneNumber(this.phoneNumberInput, this.selectedCountry)
-        this.updateModel(phoneNumber)
-        this.checkValidity(phoneNumber)
-      } catch (error) {
-        this.ParseError(error)
-      }
+      const country = event.target.value
+      this.selectedCountry = country
+      this.$emit('country', this.selectedCountry)
+      this.parsePhoneNumber()
     },
     onInput (event) {
-      try {
-        const phoneNumber = this.parsePhoneNumber(this.phoneNumberInput, this.selectedCountry)
-        if (event.inputType === 'insertText') {
-          this.updateModel(phoneNumber)
+      let value = event.target.value
+      if (!this.selectedCountry) {
+        if (value.length && value[0] !== '!') {
+          value = '+' + value
         }
-        this.checkValidity(phoneNumber)
+      }
+      const number = parseIncompletePhoneNumber(value)
+
+      // Workaround for the `(xxx)` backspace issue
+      this.phoneNumber = (number === this.phoneNumber && formatIncompletePhoneNumber(number, this.selectedCountry).indexOf(value) === 0)
+        ? number.slice(0, -1)
+        : number
+
+      this.$emit('input', this.phoneNumber)
+      this.parsePhoneNumber()
+    },
+    parsePhoneNumber () {
+      try {
+        const phoneNumber = parsePhoneNumber(this.phoneNumber, this.selectedCountry)
+        const phoneNumberDetails = {
+          country: phoneNumber.country,
+          countryCallingCode: phoneNumber.countryCallingCode,
+          number: phoneNumber.number,
+          numberFormatted: phoneNumber.formatInternational(),
+          nationalNumber: phoneNumber.nationalNumber,
+          nationalNumberFormatted: this.phoneNumberFormatted,
+          uri: phoneNumber.getURI(),
+          possible: phoneNumber.isPossible(),
+          valid: phoneNumber.isValid(),
+          type: phoneNumber.getType()
+        }
+        if (phoneNumber.country) {
+          this.selectedCountry = phoneNumber.country
+          this.$emit('country', this.selectedCountry)
+        }
+        const validityMessage = phoneNumberDetails.valid ? '' : this.validityErrorMessage
+        this.setValidityErrorMessage(validityMessage)
+        this.$emit('update', phoneNumberDetails)
+        this.$emit('valid', phoneNumberDetails.valid)
+        return phoneNumberDetails
       } catch (error) {
-        this.ParseError(error)
+        const message = error instanceof ParseError
+          ? this.validityErrorMessage
+          : error
+        this.setValidityErrorMessage(message)
+        this.$emit('update', null)
+        this.$emit('valid', false)
+        this.$emit('error', message)
       }
-    },
-    formatNational (input, country = null) {
-      return new AsYouType(country).input(input)
-    },
-    parsePhoneNumber (input, selectedCountry) {
-      const phoneNumber = parsePhoneNumber(input, selectedCountry)
-      const { country, countryCallingCode, nationalNumber, number } = phoneNumber
-      const possible = phoneNumber.isPossible()
-      const valid = phoneNumber.isValid()
-      const type = phoneNumber.getType()
-      const numberFormatted = phoneNumber.formatInternational()
-      const nationalNumberFormatted = valid ? phoneNumber.formatNational() : this.formatNational(input, selectedCountry)
-      const uri = phoneNumber.getURI()
-      const phoneNumberDetails = {
-        country,
-        countryCallingCode,
-        number,
-        numberFormatted,
-        nationalNumber,
-        nationalNumberFormatted,
-        uri,
-        possible,
-        valid,
-        type
-      }
-      this.$emit('country', country)
-      this.$emit('update', phoneNumberDetails)
-      this.$emit('input', number)
-      return phoneNumberDetails
-    },
-    ParseError (error) {
-      const message = error instanceof ParseError
-        ? this.validityErrorMessage
-        : error
-      this.setValidityErrorMessage(message)
-      this.$emit('error', error)
-      return message
-    },
-    updateModel (phoneNumber) {
-      if (phoneNumber.country) {
-        this.selectedCountry = phoneNumber.country
-      }
-      this.phoneNumberInput = phoneNumber.nationalNumberFormatted
     },
     setValidityErrorMessage (message) {
       this.$refs.input.setCustomValidity(message)
-    },
-    checkValidity (phoneNumber) {
-      const valid = phoneNumber.valid
-      const validityMessage = valid ? '' : this.validityErrorMessage
-      this.setValidityErrorMessage(validityMessage)
-      this.$emit('valid', valid)
-      return valid
     }
   },
   mounted () {
     if (this.value) {
-      try {
-        const phoneNumber = this.parsePhoneNumber(this.value, this.country)
-        this.updateModel(phoneNumber)
-        this.checkValidity(phoneNumber)
-      } catch (error) {
-        this.ParseError(error)
-      }
+      this.parsePhoneNumber()
     }
   }
 }
