@@ -72,7 +72,7 @@ export default {
   data () {
     return {
       phoneCountry: 'CA',
-      phoneNumber: '+15062345678',
+      phoneNumber: '5062345678',
       phoneNumberDetails: null,
       valid: null,
       error: null
