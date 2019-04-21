@@ -1,6 +1,6 @@
 {
   "name": "cube-vue-phone-number-input",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A super simple phone number input component for Vue based on libphonenumber-js.",
   "author": "Fred Gomez <fred@cube.rentals>",
   "license": "MIT",
