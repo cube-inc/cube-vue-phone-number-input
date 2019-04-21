@@ -126,6 +126,7 @@ export default {
   },
   mounted () {
     if (this.value) {
+      this.$emit('input', this.phoneNumber)
       this.parsePhoneNumber()
     }
   }
