@@ -38,7 +38,7 @@ export default {
     value: { type: String, default: null },
     country: { type: String, default: null },
     countries: { type: Array, default: () => countries },
-    countryCodePlaceholder: { type: String, default: 'Country' },
+    countryCodePlaceholder: { type: String, default: 'International' },
     countryCodeClass: { type: [String, Array, Object], default: null },
     inputClass: { type: [String, Array, Object], default: null },
     placeholder: { type: String, default: 'Phone number' },
@@ -126,7 +126,6 @@ export default {
   },
   mounted () {
     if (this.value) {
-      this.$emit('input', this.phoneNumber)
       this.parsePhoneNumber()
     }
   }
