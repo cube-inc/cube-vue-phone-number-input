@@ -11,9 +11,7 @@ describe('InputPhoneNumber', () => {
     expect(wrapper.find('select').element.value).toBe('CA')
     expect(wrapper.find('input').element.value).toBe('(506) 234-5678')
 
-    expect(wrapper.emitted().input).toBeTruthy()
-    expect(wrapper.emitted().input.length).toBe(1)
-    expect(wrapper.emitted().input[0][0]).toBe('5062345678')
+    expect(wrapper.emitted().input).toBeFalsy()
 
     expect(wrapper.emitted().update).toBeTruthy()
     expect(wrapper.emitted().update.length).toBe(1)
@@ -44,17 +42,17 @@ describe('InputPhoneNumber', () => {
     const wrapper = shallowMount(InputPhoneNumber, {
       propsData: { country, value }
     })
-    expect(wrapper.emitted().input.length).toBe(1)
+    expect(wrapper.emitted().input).toBeFalsy()
     expect(wrapper.emitted().update.length).toBe(1)
     expect(wrapper.emitted().country.length).toBe(1)
     expect(wrapper.emitted().valid.length).toBe(1)
 
     wrapper.find('input').setValue('(506)')
-    expect(wrapper.emitted().input.length).toBe(2)
+    expect(wrapper.emitted().input.length).toBe(1)
     expect(wrapper.emitted().update.length).toBe(2)
     expect(wrapper.emitted().country.length).toBe(2)
     expect(wrapper.emitted().valid.length).toBe(2)
-    expect(wrapper.emitted().input[1][0]).toBe('506')
+    expect(wrapper.emitted().input[0][0]).toBe('506')
     expect(wrapper.emitted().update[1][0].nationalNumber).toBe('506')
     expect(wrapper.emitted().update[1][0].nationalNumberFormatted).toBe('(506)')
     expect(wrapper.emitted().update[1][0].number).toBe('+1506')
@@ -64,11 +62,11 @@ describe('InputPhoneNumber', () => {
 
     // Removes the `)`, expect the last digit is removed as well
     wrapper.find('input').setValue('(506')
-    expect(wrapper.emitted().input.length).toBe(3)
+    expect(wrapper.emitted().input.length).toBe(2)
     expect(wrapper.emitted().update.length).toBe(3)
     expect(wrapper.emitted().country.length).toBe(3)
     expect(wrapper.emitted().valid.length).toBe(3)
-    expect(wrapper.emitted().input[2][0]).toBe('50')
+    expect(wrapper.emitted().input[1][0]).toBe('50')
     expect(wrapper.emitted().update[2][0].country).toBe('CA')
     expect(wrapper.emitted().country[2][0]).toBe('CA')
     expect(wrapper.emitted().valid[2][0]).toBe(false)
