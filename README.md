@@ -39,7 +39,6 @@ yarn add cube-vue-phone-number-input
 
 <script>
 import InputPhoneNumber from 'cube-vue-phone-number-input'
-import 'cube-vue-phone-number-input/src/scss/cube-phone-number-input-inline.scss'
 
 export default {
   components: {
@@ -53,6 +52,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+@import "~cube-vue-phone-number-input/src/scss/_inline.scss";
+</style>
 ```
 
 ## Props

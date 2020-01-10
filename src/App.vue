@@ -101,7 +101,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./scss/cube-phone-number-input-inline.scss";
+@import "./scss/_inline.scss";
 
 body {
   margin: 0;
