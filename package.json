@@ -1,50 +1,41 @@
 {
   "name": "cube-vue-phone-number-input",
   "version": "0.3.0",
+  "private": false,
   "description": "A super simple phone number input component for Vue based on libphonenumber-js.",
   "author": "Fred Gomez <fred@cube.rentals>",
-  "license": "MIT",
-  "private": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cube-inc/cube-vue-phone-number-input.git"
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "lint": "vue-cli-service lint",
+    "bundle": "rollup --config rollup.config.js",
+    "prepublishOnly": "yarn lint && yarn test:unit && yarn bundle",
+    "watch": "yarn bundle --watch"
   },
-  "keywords": [
-    "vue",
-    "phone number",
-    "input"
-  ],
   "main": "dist/cube-vue-phone-number-input.umd.js",
   "module": "dist/cube-vue-phone-number-input.esm.js",
-  "unpkg": "dist/cube-vue-phone-number-input.min.js",
   "browser": {
     "./sfc": "src/components/InputPhoneNumber.vue"
   },
+  "unpkg": "dist/cube-vue-phone-number-input.min.js",
   "files": [
     "dist",
     "src/assets",
     "src/scss",
     "src/components/InputPhoneNumber.vue"
   ],
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "bundle": "rollup --config rollup.config.js",
-    "watch": "yarn bundle --watch",
-    "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit",
-    "prepublishOnly": "yarn lint && yarn test:unit && yarn bundle"
-  },
   "dependencies": {
+    "core-js": "^3.6.4",
     "libphonenumber-js": "^1.7.15"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^3.0.0",
     "@rollup/plugin-json": "^4.0.1",
-    "@vue/cli-plugin-babel": "^3.6.0",
-    "@vue/cli-plugin-eslint": "^3.6.0",
+    "@vue/cli-plugin-babel": "~4.2.2",
+    "@vue/cli-plugin-eslint": "~4.2.2",
     "@vue/cli-plugin-unit-jest": "^3.6.0",
-    "@vue/cli-service": "^3.6.0",
+    "@vue/cli-service": "~4.2.2",
     "@vue/eslint-config-standard": "^4.0.0",
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
@@ -65,5 +56,15 @@
     "sass-loader": "^7.1.0",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.5.21"
+  },
+  "keywords": [
+    "vue",
+    "phone number",
+    "input"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cube-inc/cube-vue-phone-number-input.git"
   }
 }
